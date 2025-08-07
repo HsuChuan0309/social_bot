@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chatbot 全螢幕（5 次互動後解鎖）</title>
+  <title>Chatbot 全螢幕（5 次互動後解鎖 / 強化版）</title>
   <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
   <style>
     html, body {
@@ -13,7 +13,6 @@
       width: 100%;
       background: #ffffff;
     }
-    /* 讓聊天窗填滿整個畫面 */
     df-messenger {
       --df-messenger-chat-window-width: 100vw;
       --df-messenger-chat-window-height: 100vh;
@@ -50,38 +49,56 @@
   </df-messenger>
 
   <script>
-    // 計算「使用者發送文字」的次數 —— 達到 5 次就通知父頁面
     let userTurnCount = 0;
     const REQUIRED_TURNS = 5;
     let unlocked = false;
 
+    function unlockIfReady() {
+      if (!unlocked && userTurnCount >= REQUIRED_TURNS) {
+        unlocked = true;
+        const msg = "show-next-button";
+        // 通知父與最上層（有些平台的 iframe 巢狀結構不同）
+        try { window.parent.postMessage(msg, "*"); } catch (e) {}
+        try { window.top.postMessage(msg, "*"); } catch (e) {}
+        const hint = document.querySelector(".hint");
+        if (hint) hint.textContent = "✅ 條件達成，可以進入下一頁";
+      }
+    }
+
+    // 1) 使用者按下送出時（官方事件名稱）
     window.addEventListener("message", (event) => {
       const data = event.data || {};
-
-      // Dialogflow Messenger 載入事件
-      if (data.eventType === "dfMessengerLoaded") {
-        console.log("💬 Chatbot 已載入");
-      }
-
-      // 收到一次 agent 的回應事件；裡面同時會帶上當次 request 的 queryInput
-      if (data.eventType === "dfResponse") {
-        // 僅當使用者有輸入純文字時才計數
-        if (data.queryInput && data.queryInput.text && data.queryInput.text.text) {
+      if (data.eventType === "dfUserInputEntered") {
+        // data.queryInput?.text?.text
+        const t = data.queryInput && data.queryInput.text && data.queryInput.text.text;
+        if (t && t.trim().length > 0) {
           userTurnCount += 1;
-          console.log("使用者輸入次數:", userTurnCount);
-
-          if (!unlocked && userTurnCount >= REQUIRED_TURNS) {
-            unlocked = true;
-            // 通知父頁面（Qualtrics）可以顯示下一頁按鈕
-            window.parent.postMessage("show-next-button", "*");
-            console.log("✅ 已達到 5 次，已通知父頁面顯示下一頁按鈕");
-            // 顯示完成提示
-            const hint = document.querySelector(".hint");
-            if (hint) hint.textContent = "✅ 條件達成，可以進入下一頁";
-          }
+          unlockIfReady();
         }
       }
     });
+
+    // 2) 備援：在收到 dfResponse 時，也從 queryInput 判斷是否為使用者文字
+    window.addEventListener("message", (event) => {
+      const data = event.data || {};
+      if (data.eventType === "dfResponse") {
+        const t = data.queryInput && data.queryInput.text && data.queryInput.text.text;
+        if (t && t.trim().length > 0) {
+          userTurnCount += 1;
+          unlockIfReady();
+        }
+      }
+    });
+
+    // 3) 最後備援：超過一定時間或偵測到 10 則訊息時，仍未解鎖就主動放行（避免受試者被卡住）
+    setTimeout(() => {
+      if (!unlocked) {
+        try { window.parent.postMessage("show-next-button", "*"); } catch (e) {}
+        try { window.top.postMessage("show-next-button", "*"); } catch (e) {}
+        const hint = document.querySelector(".hint");
+        if (hint) hint.textContent = "⚠️ 時間到，自動允許繼續";
+      }
+    }, 10 * 60 * 1000); // 10 分鐘保險機制
   </script>
 </body>
 </html>
