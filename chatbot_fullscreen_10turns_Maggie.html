@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot 全螢幕（5 次互動後解鎖 / 事件修正版）</title>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+  <style>
+    html, body { margin:0; padding:0; height:100%; width:100%; background:#fff; }
+    df-messenger {
+      --df-messenger-chat-window-width: 100vw;
+      --df-messenger-chat-window-height: 100vh;
+      --df-messenger-chat-background-color: white;
+      --df-messenger-bot-message: #f1f1f1;
+      --df-messenger-user-message: #cfe9ff;
+      --df-messenger-font-color: black;
+      position:fixed; inset:0;
+    }
+    .hud {
+      position: fixed;
+      top: 10px; left: 12px;
+      display: flex; gap: 8px; align-items: center;
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+      z-index: 9999;
+    }
+    .badge {
+      background: rgba(0,0,0,0.75);
+      color: #fff; padding: 6px 10px; border-radius: 999px; font-size: 13px;
+    }
+    .btn {
+      background: #2563eb; color:#fff; border:none; border-radius: 8px; padding: 6px 10px;
+      font-size: 13px; cursor: pointer; display:none;
+    }
+    .hint { color:#333; background: rgba(255,255,255,.85); padding:4px 8px; border-radius: 6px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="hud">
+    <span class="badge">已輸入：<b id="cnt">0</b> / 5</span>
+    <span class="hint" id="hint">請至少輸入 5 次訊息</span>
+    <button class="btn" id="doneBtn" aria-disabled="true">我完成了</button>
+  </div>
+
+  <df-messenger
+    intent="WELCOME"
+    chat-title="Maggie"
+    agent-id="236034eb-ea4a-47e7-b0c8-202f144d704e"
+    language-code="zh-tw"
+    expand="true">
+  </df-messenger>
+
+  <script>
+    const REQUIRED_TURNS = 5;
+    let userTurnCount = 0;
+    let unlocked = false;
+
+    const cntEl = document.getElementById('cnt');
+    const hintEl = document.getElementById('hint');
+    const doneBtn = document.getElementById('doneBtn');
+    const df = document.querySelector('df-messenger');
+
+    function updateHUD() {
+      cntEl.textContent = userTurnCount;
+      if (userTurnCount >= REQUIRED_TURNS) {
+        hintEl.textContent = '✅ 條件達成，可以進入下一頁';
+        doneBtn.style.display = 'inline-block';
+        doneBtn.removeAttribute('aria-disabled');
+      }
+    }
+
+    function notifyParent() {
+      const msg = 'show-next-button';
+      try { window.parent.postMessage(msg, '*'); } catch(e) {}
+      try { window.top.postMessage(msg, '*'); } catch(e) {}
+    }
+
+    function unlockIfReady(auto=true) {
+      if (!unlocked && userTurnCount >= REQUIRED_TURNS) {
+        unlocked = true;
+        if (auto) notifyParent();
+      }
+      updateHUD();
+    }
+
+    doneBtn.addEventListener('click', () => {
+      if (userTurnCount >= REQUIRED_TURNS) notifyParent();
+    });
+
+    // --- 1) 監聽 df-messenger 的 DOM 自訂事件（最可靠） ---
+    const inc = () => { userTurnCount += 1; unlockIfReady(true); };
+    df.addEventListener('df-user-input-entered', inc);     // 使用者按送出
+    df.addEventListener('df-request-sent', inc);           // 請求已送出（備援）
+    // df.addEventListener('df-response-received', () => {}); // 若需要可觀察回覆
+
+    // --- 2) 備援：window.postMessage 事件（不同版本會用這套） ---
+    window.addEventListener('message', (event) => {
+      const d = event.data || {};
+      const t = d.queryInput && d.queryInput.text && d.queryInput.text.text;
+      if (d.eventType === 'dfUserInputEntered' && t && t.trim().length > 0) {
+        userTurnCount += 1; unlockIfReady(true);
+      }
+      if (d.eventType === 'dfRequestSent' && t && t.trim().length > 0) {
+        userTurnCount += 1; unlockIfReady(true);
+      }
+    });
+
+    // --- 3) 再備援：用 MutationObserver 數使用者訊息泡泡 ---
+    function startMutationObserver() {
+      const root = df.shadowRoot;
+      if (!root) return;
+      const list = root.querySelector('[data-message-list], df-message-list, .messages') || root;
+      const obs = new MutationObserver(() => {
+        try {
+          const userBubbles = root.querySelectorAll('[data-user-message="true"], .user-message, .from-user');
+          const n = userBubbles.length;
+          if (n > userTurnCount) { userTurnCount = n; unlockIfReady(false); }
+        } catch(e){}
+      });
+      obs.observe(list, { childList:true, subtree:true });
+    }
+    // 等元件渲染完成再掛 observer
+    window.addEventListener('load', () => setTimeout(startMutationObserver, 1200));
+
+    // --- 4) 最後保險：10 分鐘自動放行 ---
+    setTimeout(() => {
+      if (!unlocked) {
+        notifyParent();
+        hintEl.textContent = '⚠️ 時間到，自動允許繼續';
+      }
+    }, 10 * 60 * 1000);
+  </script>
+</body>
+</html>
