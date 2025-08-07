@@ -3,16 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chatbot 全螢幕（5 次互動後解鎖 / 強化版）</title>
+  <title>Chatbot 全螢幕（5 次互動後解鎖 / 強化偵測+手動備援）</title>
   <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      background: #ffffff;
-    }
+    html, body { margin:0; padding:0; height:100%; width:100%; background:#fff; }
     df-messenger {
       --df-messenger-chat-window-width: 100vw;
       --df-messenger-chat-window-height: 100vh;
@@ -20,25 +14,33 @@
       --df-messenger-bot-message: #f1f1f1;
       --df-messenger-user-message: #cfe9ff;
       --df-messenger-font-color: black;
-      position: fixed;
-      inset: 0;
+      position:fixed; inset:0;
     }
-    .hint {
+    .hud {
       position: fixed;
-      top: 10px;
-      left: 12px;
-      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Noto Sans, Arial, "Noto Sans TC", "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-      font-size: 14px;
-      color: #666;
-      z-index: 1;
-      background: rgba(255,255,255,0.7);
-      padding: 6px 10px;
-      border-radius: 8px;
+      top: 10px; left: 12px;
+      display: flex; gap: 8px; align-items: center;
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+      z-index: 9999;
     }
+    .badge {
+      background: rgba(0,0,0,0.75);
+      color: #fff; padding: 6px 10px; border-radius: 999px; font-size: 13px;
+    }
+    .btn {
+      background: #2563eb; color:#fff; border:none; border-radius: 8px; padding: 6px 10px;
+      font-size: 13px; cursor: pointer; display:none;
+    }
+    .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+    .hint { color:#333; background: rgba(255,255,255,.8); padding:4px 8px; border-radius: 6px; font-size: 12px; }
   </style>
 </head>
 <body>
-  <div class="hint">🌟 請至少輸入 5 次訊息，達成後會自動解鎖下一頁</div>
+  <div class="hud">
+    <span class="badge">已輸入：<b id="cnt">0</b> / 5</span>
+    <span class="hint" id="hint">請至少輸入 5 次訊息</span>
+    <button class="btn" id="doneBtn" aria-disabled="true">我完成了</button>
+  </div>
 
   <df-messenger
     intent="WELCOME"
@@ -49,56 +51,98 @@
   </df-messenger>
 
   <script>
-    let userTurnCount = 0;
     const REQUIRED_TURNS = 5;
+    let userTurnCount = 0;
     let unlocked = false;
 
-    function unlockIfReady() {
-      if (!unlocked && userTurnCount >= REQUIRED_TURNS) {
-        unlocked = true;
-        const msg = "show-next-button";
-        // 通知父與最上層（有些平台的 iframe 巢狀結構不同）
-        try { window.parent.postMessage(msg, "*"); } catch (e) {}
-        try { window.top.postMessage(msg, "*"); } catch (e) {}
-        const hint = document.querySelector(".hint");
-        if (hint) hint.textContent = "✅ 條件達成，可以進入下一頁";
+    const cntEl = document.getElementById('cnt');
+    const hintEl = document.getElementById('hint');
+    const doneBtn = document.getElementById('doneBtn');
+
+    function updateHUD() {
+      cntEl.textContent = userTurnCount;
+      if (userTurnCount >= REQUIRED_TURNS) {
+        hintEl.textContent = '✅ 條件達成，可以進入下一頁';
+        doneBtn.style.display = 'inline-block';
+        doneBtn.setAttribute('aria-disabled','false');
       }
     }
 
-    // 1) 使用者按下送出時（官方事件名稱）
-    window.addEventListener("message", (event) => {
-      const data = event.data || {};
-      if (data.eventType === "dfUserInputEntered") {
-        // data.queryInput?.text?.text
-        const t = data.queryInput && data.queryInput.text && data.queryInput.text.text;
+    function notifyParent() {
+      const msg = 'show-next-button';
+      try { window.parent.postMessage(msg, '*'); } catch(e) {}
+      try { window.top.postMessage(msg, '*'); } catch(e) {}
+    }
+
+    function unlockIfReady(auto=true) {
+      if (!unlocked && userTurnCount >= REQUIRED_TURNS) {
+        unlocked = true;
+        if (auto) notifyParent();
+        updateHUD();
+      } else {
+        updateHUD();
+      }
+    }
+
+    // 手動備援按鈕
+    doneBtn.addEventListener('click', () => {
+      if (userTurnCount >= REQUIRED_TURNS) notifyParent();
+    });
+
+    // 1) 官方 postMessage 事件：使用者輸入 / Agent 回應
+    window.addEventListener('message', (event) => {
+      const d = event.data || {};
+      // 使用者按下送出（最準）
+      if (d.eventType === 'dfUserInputEntered') {
+        const t = d.queryInput && d.queryInput.text && d.queryInput.text.text;
         if (t && t.trim().length > 0) {
           userTurnCount += 1;
-          unlockIfReady();
+          unlockIfReady(true);
+        }
+      }
+      // 備援：從 dfResponse 的 queryInput 也能抓到使用者當次輸入
+      if (d.eventType === 'dfResponse') {
+        const t = d.queryInput && d.queryInput.text && d.queryInput.text.text;
+        if (t && t.trim().length > 0) {
+          userTurnCount += 1;
+          unlockIfReady(true);
         }
       }
     });
 
-    // 2) 備援：在收到 dfResponse 時，也從 queryInput 判斷是否為使用者文字
-    window.addEventListener("message", (event) => {
-      const data = event.data || {};
-      if (data.eventType === "dfResponse") {
-        const t = data.queryInput && data.queryInput.text && data.queryInput.text.text;
-        if (t && t.trim().length > 0) {
-          userTurnCount += 1;
-          unlockIfReady();
-        }
-      }
+    // 2) 觀察 shadow DOM：計算使用者聊天泡數（class 可能調整，此為備援）
+    function startMutationObserver() {
+      const df = document.querySelector('df-messenger');
+      if (!df) return;
+      const root = df.shadowRoot;
+      if (!root) return;
+      const list = root.querySelector('[data-message-list], df-message-list, .messages') || root;
+      const obs = new MutationObserver(() => {
+        try {
+          // 嘗試抓取使用者訊息泡泡（多種選擇器備援）
+          const userBubbles = root.querySelectorAll('[data-user-message="true"], .user-message, .from-user');
+          const countGuess = userBubbles.length;
+          if (countGuess > userTurnCount) {
+            userTurnCount = countGuess;
+            unlockIfReady(false); // 這個路徑不自動放行，只更新顯示與啟用手動按鈕
+          }
+        } catch(e){}
+      });
+      obs.observe(list, { childList:true, subtree:true });
+    }
+
+    // 嘗試延遲啟動 observer
+    window.addEventListener('load', () => {
+      setTimeout(startMutationObserver, 1200);
     });
 
-    // 3) 最後備援：超過一定時間或偵測到 10 則訊息時，仍未解鎖就主動放行（避免受試者被卡住）
+    // 3) 保險機制：10 分鐘強制放行
     setTimeout(() => {
       if (!unlocked) {
-        try { window.parent.postMessage("show-next-button", "*"); } catch (e) {}
-        try { window.top.postMessage("show-next-button", "*"); } catch (e) {}
-        const hint = document.querySelector(".hint");
-        if (hint) hint.textContent = "⚠️ 時間到，自動允許繼續";
+        notifyParent();
+        hintEl.textContent = '⚠️ 時間到，自動允許繼續';
       }
-    }, 10 * 60 * 1000); // 10 分鐘保險機制
+    }, 10 * 60 * 1000);
   </script>
 </body>
 </html>
