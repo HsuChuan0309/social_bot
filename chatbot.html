@@ -1,1 +1,61 @@
-<html><head><meta content="text/html; charset=UTF-8" http-equiv="content-type"><style type="text/css">ol{margin:0;padding:0}table td,table th{padding:0}.c1{color:#000000;font-weight:400;text-decoration:none;vertical-align:baseline;font-size:11pt;font-family:"Arial";font-style:normal}.c0{padding-top:0pt;padding-bottom:0pt;line-height:1.15;orphans:2;widows:2;text-align:left}.c3{background-color:#ffffff;max-width:451.4pt;padding:72pt 72pt 72pt 72pt}.c2{height:11pt}.title{padding-top:0pt;color:#000000;font-size:26pt;padding-bottom:3pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}.subtitle{padding-top:0pt;color:#666666;font-size:15pt;padding-bottom:16pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}li{color:#000000;font-size:11pt;font-family:"Arial"}p{margin:0;color:#000000;font-size:11pt;font-family:"Arial"}h1{padding-top:20pt;color:#000000;font-size:20pt;padding-bottom:6pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h2{padding-top:18pt;color:#000000;font-size:16pt;padding-bottom:6pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h3{padding-top:16pt;color:#434343;font-size:14pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h4{padding-top:14pt;color:#666666;font-size:12pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h5{padding-top:12pt;color:#666666;font-size:11pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;orphans:2;widows:2;text-align:left}h6{padding-top:12pt;color:#666666;font-size:11pt;padding-bottom:4pt;font-family:"Arial";line-height:1.15;page-break-after:avoid;font-style:italic;orphans:2;widows:2;text-align:left}</style></head><body class="c3 doc-content"><p class="c0"><span class="c1">&lt;!DOCTYPE html&gt;</span></p><p class="c0"><span class="c1">&lt;html lang=&quot;zh-TW&quot;&gt;</span></p><p class="c0"><span class="c1">&lt;head&gt;</span></p><p class="c0"><span class="c1">&nbsp; &lt;meta charset=&quot;UTF-8&quot; /&gt;</span></p><p class="c0"><span class="c1">&nbsp; &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;</span></p><p class="c0"><span class="c1">&nbsp; &lt;title&gt;Chatbot&lt;/title&gt;</span></p><p class="c0"><span class="c1">&nbsp; &lt;script src=&quot;https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1&quot;&gt;&lt;/script&gt;</span></p><p class="c0"><span class="c1">&nbsp; &lt;style&gt;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; body, html {</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; margin: 0;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; padding: 0;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; height: 100%;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; }</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; df-messenger {</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; --df-messenger-bot-message: #f1f1f1;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; --df-messenger-user-message: #cfe9ff;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; --df-messenger-font-color: black;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; --df-messenger-chat-background-color: white;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; width: 100%;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; height: 100%;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; }</span></p><p class="c0"><span class="c1">&nbsp; &lt;/style&gt;</span></p><p class="c0"><span class="c1">&lt;/head&gt;</span></p><p class="c0"><span class="c1">&lt;body&gt;</span></p><p class="c0"><span class="c1">&nbsp; &lt;df-messenger</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; intent=&quot;WELCOME&quot;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; chat-title=&quot;0806&quot;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; agent-id=&quot;236034eb-ea4a-47e7-b0c8-202f144d704e&quot;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; language-code=&quot;zh-tw&quot;&gt;</span></p><p class="c0"><span class="c1">&nbsp; &lt;/df-messenger&gt;</span></p><p class="c0 c2"><span class="c1"></span></p><p class="c0"><span class="c1">&nbsp; &lt;script&gt;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; // &#31684;&#20363;&#65306;&#30070;&#20597;&#28204;&#21040;&#23565;&#35441;&#23436;&#25104;&#26178;&#65292;&#36890;&#30693;&#29238;&#38913;&#38754;&#65288;Qualtrics&#65289;&#39023;&#31034;&#19979;&#19968;&#38913;&#25353;&#37397;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; // &#20320;&#21487;&#20197;&#26681;&#25818;&#26368;&#24460;&#19968;&#21477;&#30340;&#35338;&#24687;&#20839;&#23481;&#20358;&#35320;&#30332;</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; window.addEventListener(&quot;message&quot;, (event) =&gt; {</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; if (event.data === &quot;chat-finished&quot;) {</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; &nbsp; window.parent.postMessage(&quot;show-next-button&quot;, &quot;*&quot;);</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; &nbsp; }</span></p><p class="c0"><span class="c1">&nbsp; &nbsp; });</span></p><p class="c0"><span class="c1">&nbsp; &lt;/script&gt;</span></p><p class="c0"><span class="c1">&lt;/body&gt;</span></p><p class="c0"><span class="c1">&lt;/html&gt;</span></p><p class="c0 c2"><span class="c1"></span></p><p class="c0 c2"><span class="c1"></span></p></body></html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="zh-TW"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
+<p class="p1">&lt;title&gt;Chatbot&lt;/title&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"&gt;&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>body, html {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>padding: 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>height: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>df-messenger {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--df-messenger-bot-message: #f1f1f1;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--df-messenger-user-message: #fce9ff;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--df-messenger-font-color: black;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--df-messenger-chat-background-color: white;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>height: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;df-messenger</p>
+<p class="p1"><span class="Apple-converted-space">  </span>intent="WELCOME"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>chat-title="0806"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>agent-id="236034eb-ea4a-47e7-b0c8-202f144d704e"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>language-code="zh-tw"&gt;</p>
+<p class="p1">&lt;/df-messenger&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// 例：當偵測到對話完成時，通知父頁面 (Qualtrics) 顯示下一頁按鈕</p>
+<p class="p1"><span class="Apple-converted-space">  </span>window.addEventListener("message", (event) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (event.data === "chat-finished") {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>window.parent.postMessage("show-next-button", "*");</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>});</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
