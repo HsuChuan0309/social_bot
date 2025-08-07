@@ -1,18 +1,34 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot 測試</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot 全螢幕</title>
+  <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    df-messenger {
+      --df-messenger-bot-message: #f1f1f1;
+      --df-messenger-user-message: #cfe9ff;
+      --df-messenger-font-color: black;
+      --df-messenger-chat-background-color: white;
+      height: 100%;
+      width: 100%;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-    <h2>Chatbot 測試頁面</h2>
-    <script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
-    <df-messenger
-      intent="WELCOME"
-      chat-title="0806"
-      agent-id="236034eb-ea4a-47e7-b0c8-202f144d704e"
-      language-code="zh-tw"
-    ></df-messenger>
+  <df-messenger
+    intent="WELCOME"
+    chat-title="0806"
+    agent-id="236034eb-ea4a-47e7-b0c8-202f144d704e"
+    language-code="zh-tw"
+  ></df-messenger>
 </body>
 </html>
